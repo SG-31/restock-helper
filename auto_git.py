@@ -25,6 +25,8 @@ def run_git(args):
         ["git"] + args,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0:
         print("エラーが発生しました:")
