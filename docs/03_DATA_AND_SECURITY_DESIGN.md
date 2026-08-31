@@ -7,7 +7,7 @@
 | Item（項目） | Value（値） |
 |---|---|
 | Document ID（文書ID） | RSH-DATA |
-| Version（バージョン） | 0.1 |
+| Version（バージョン） | 0.2 |
 | Status（ステータス） | Draft |
 | Created Date（作成日） | 2026-08-31 |
 | Last Updated（最終更新日） | 2026-08-31 |
@@ -135,6 +135,7 @@ shopping_memos（買ってほしいもの） … 独立（他エンティティ�
 |---|---|---|---|---|
 | TBD-001 | クラウド公開時のHTTPS対応方法の確認 | SG-31 | ⑦デプロイ段階 | Open |
 | TBD-002 | SQLインジェクション対策（プレースホルダ使用）の実装時レビュー | SG-31 | ⑤実装段階 | Open |
+| TBD-003 | Flaskの`debug=True`を、デプロイ前に`False`へ変更する（ruff `S201`で検出済み） | SG-31 | ⑦デプロイ段階 | Open |
 
 ---
 
