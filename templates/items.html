@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>管理品目一覧</title>
+</head>
+
+<body>
+
+    <h1>管理品目一覧</h1>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+
+    {% if items %}
+        <table border="1">
+            <tr>
+                <th>品目名</th>
+                <th>単位</th>
+                <th>現在庫</th>
+                <th>操作</th>
+            </tr>
+
+            {% for item in items %}
+            <tr>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>
+                    <a href="/items/{{ item[0] }}/edit">変更</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>管理品目は登録されていません。</p>
+    {% endif %}
+
+    <p>
+        <a href="/items/new">管理品目を登録</a>
+    </p>
+
+</body>
+
+</html>
