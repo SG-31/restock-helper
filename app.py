@@ -1,6 +1,6 @@
 import sqlite3
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
@@ -295,6 +295,67 @@ def edit_item(item_id):
         if connection is not None:
             connection.close()
 
+# =========================
+# 管理品目削除
+# =========================
+
+@app.route("/items/<int:item_id>/delete", methods=["POST"])
+def delete_item(item_id):
+    """指定された管理品目を削除する。"""
+
+    connection = None
+
+    try:
+        # DBに接続
+        connection = sqlite3.connect(DATABASE)
+
+        # この接続でも外部キー制約を有効にする
+        connection.execute("PRAGMA foreign_keys = ON")
+
+        # 指定されたIDの品目が存在するか確認
+        cursor = connection.execute(
+            """
+            SELECT id
+            FROM items
+            WHERE id = ?
+            """,
+            (item_id,)
+        )
+
+        item = cursor.fetchone()
+
+        # 指定されたIDの品目が存在しない場合
+        if item is None:
+            return "品目が見つかりません。", 404
+
+        # 管理品目を削除
+        # ON DELETE CASCADEにより、紐づくconsumptionsも削除される
+        connection.execute(
+            """
+            DELETE FROM items
+            WHERE id = ?
+            """,
+            (item_id,)
+        )
+
+        # 削除を確定
+        connection.commit()
+
+        # 管理品目一覧へ戻る
+        return redirect("/items")
+
+    except sqlite3.Error as error:
+        print(f"管理品目の削除エラー: {error}")
+        return render_template(
+            "items.html",
+            items=[],
+            error=f"管理品目を削除できませんでした。DBエラー: {error}"
+        )
+
+    finally:
+        # DB接続ができていた場合は必ず閉じる
+        if connection is not None:
+            connection.close()
 
 # =========================
 # アプリ起動

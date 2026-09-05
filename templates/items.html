@@ -30,6 +30,15 @@
                 <td>{{ item[3] }}</td>
                 <td>
                     <a href="/items/{{ item[0] }}/edit">変更</a>
+
+                    <form
+                        method="POST"
+                        action="/items/{{ item[0] }}/delete"
+                        style="display:inline"
+                        onsubmit="return confirm('削除すると、この品目の過去の消費量データも消えます。よろしいですか？');"
+                    >
+                        <button type="submit">削除</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
