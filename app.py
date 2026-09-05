@@ -120,7 +120,8 @@ def items():
 def new_item():
     # GETの場合：登録フォームを表示する
     if request.method == "GET":
-        return render_template("item_form.html")
+        return render_template("item_form.html", action_url="/items/new")
+        
 
     # POSTの場合：フォームから送信されたデータを保存する
     name = request.form.get("name", "").strip()
@@ -133,14 +134,16 @@ def new_item():
     except ValueError:
         return render_template(
             "item_form.html",
-            error="初期在庫数は整数で入力してください。"
+            error="初期在庫数は整数で入力してください。",
+            action_url="/items/new"
         )
 
     # 初期在庫数がマイナスの場合は保存しない
     if current_stock < 0:
         return render_template(
             "item_form.html",
-            error="初期在庫数は0以上で入力してください。"
+            error="初期在庫数は0以上で入力してください。",
+            action_url="/items/new"
         )
 
     connection = None
@@ -162,7 +165,8 @@ def new_item():
 
         return render_template(
             "item_form.html",
-            message="管理品目を登録しました。"
+            message="管理品目を登録しました。",
+            action_url="/items/new"
         )
 
     except sqlite3.Error as error:
@@ -170,7 +174,8 @@ def new_item():
 
         return render_template(
             "item_form.html",
-            error=f"管理品目を登録できませんでした。DBエラー: {error}"
+            error=f"管理品目を登録できませんでした。DBエラー: {error}",
+            action_url="/items/new"
         )
 
     finally:
