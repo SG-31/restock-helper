@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>在庫入力</title>
+</head>
+<body>
+
+<h1>在庫入力</h1>
+
+{% if error %}
+    <p>{{ error }}</p>
+{% endif %}
+
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+{% if warnings %}
+    <h2>入力内容を確認してください</h2>
+    <ul>
+        {% for warning in warnings %}
+            <li>{{ warning }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if items %}
+
+<form method="post">
+
+    <table border="1">
+        <tr>
+            <th>品目名</th>
+            <th>単位</th>
+            <th>現在庫数</th>
+        </tr>
+
+        {% for item in items %}
+        <tr>
+            <td>{{ item["name"] }}</td>
+            <td>{{ item["unit"] }}</td>
+            <td>
+                <input
+                    type="number"
+                    name="stock_{{ item['id'] }}"
+                    value="{{ item['current_stock'] }}"
+                    min="0"
+                >
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <br>
+
+    <button type="submit">保存</button>
+
+</form>
+
+{% endif %}
+
+
+{% if shopping_list %}
+
+<h2>買い物リスト</h2>
+
+<table border="1">
+    <tr>
+        <th>品目名</th>
+        <th>補充必要数</th>
+    </tr>
+
+    {% for item in shopping_list %}
+    <tr>
+        <td>{{ item["name"] }}</td>
+        <td>
+            {{ item["restock_amount"] }} {{ item["unit"] }}
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endif %}
+
+</body>
+</html>

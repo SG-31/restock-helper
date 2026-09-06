@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask
 
 from routes.items import items_bp
+from routes.stock import stock_bp
 import db
 
 
@@ -74,6 +75,7 @@ def init_db():
 # =========================
 
 app.register_blueprint(items_bp)
+app.register_blueprint(stock_bp)
 
 
 # =========================
