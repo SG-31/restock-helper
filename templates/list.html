@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>買い物リスト</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>買い物リスト</h1>
+
+    <p><a href="/">トップに戻る</a></p>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+
+    <h2>補充が必要なもの</h2>
+
+    {% if shopping_items %}
+        <ul>
+            {% for item in shopping_items %}
+            <li class="shopping-item">
+                <span class="item-name">{{ item["name"] }}</span>
+                <span class="required-quantity">
+                    {{ item["required_quantity"] }} {{ item["unit"] }}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>補充が必要なものはありません。</p>
+    {% endif %}
+
+
+    <h2>買ってほしいもの</h2>
+
+    {% if memos %}
+        <ul>
+            {% for memo in memos %}
+            <li class="memo-item">
+                <span class="memo-text">{{ memo["text"] }}</span>
+            
+                <form
+                    method="POST"
+                    action="/list/memo/{{ memo['id'] }}/delete"
+                    style="display:inline"
+                >
+                    <button type="submit">削除</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>買ってほしいものはありません。</p>
+    {% endif %}
+
+
+    <h2>買ってほしいものを追加</h2>
+
+    <form method="POST" action="/list/memo">
+        <input type="text" name="text">
+        <button type="submit">追加</button>
+    </form>
+
+</body>
+
+</html>

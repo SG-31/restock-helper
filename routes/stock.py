@@ -1,23 +1,18 @@
 import sqlite3
-
 from flask import Blueprint, render_template, request
-
 import db
+from calculations import calc_moving_average, calc_required_quantity
 
 
 stock_bp = Blueprint("stock", __name__)
 
 
 # =========================
-# 補充必要数を計算
+# 消費量を取得
 # =========================
-def calculate_restock_amount(connection, item_id, current_stock):
+def get_consumptions(connection, item_id):
     """
-    直近4件の消費量から移動平均を計算し、
-    補充必要数を求める。
-
-    consumptionsが0件の場合は、
-    買い物リストの判定対象外とするためNoneを返す。
+    指定した品目の直近4件の消費量を取得する。
     """
     cursor = connection.execute(
         """
@@ -30,26 +25,7 @@ def calculate_restock_amount(connection, item_id, current_stock):
         (item_id,)
     )
 
-    consumptions = cursor.fetchall()
-
-    # 消費量データがない品目は判定しない
-    if not consumptions:
-        return None
-
-    total_consumption = sum(
-        row["consumption"] for row in consumptions
-    )
-
-    average_consumption = total_consumption / len(consumptions)
-
-    appropriate_stock = average_consumption * 1.5
-
-    restock_amount = max(
-        0,
-        appropriate_stock - current_stock
-    )
-
-    return restock_amount
+    return cursor.fetchall()
 
 
 # =========================
@@ -67,21 +43,33 @@ def get_shopping_list(connection):
         ORDER BY id
         """
     )
-
     items = cursor.fetchall()
 
     shopping_list = []
 
     for item in items:
-        restock_amount = calculate_restock_amount(
+        consumptions = get_consumptions(
             connection,
-            item["id"],
-            item["current_stock"]
+            item["id"]
         )
 
         # 消費量データがない場合は対象外
-        if restock_amount is None:
+        if not consumptions:
             continue
+
+        consumption_values = [
+            row["consumption"]
+            for row in consumptions
+        ]
+
+        moving_average = calc_moving_average(
+            consumption_values
+        )
+
+        restock_amount = calc_required_quantity(
+            moving_average,
+            item["current_stock"]
+        )
 
         # 補充必要数が0より大きい場合だけ表示
         if restock_amount > 0:
@@ -101,7 +89,6 @@ def get_shopping_list(connection):
 # =========================
 @stock_bp.route("/input", methods=["GET", "POST"])
 def stock_input():
-
     connection = None
 
     try:
@@ -118,7 +105,6 @@ def stock_input():
             ORDER BY id
             """
         )
-
         items = cursor.fetchall()
 
         # 管理品目が0件の場合
@@ -147,7 +133,10 @@ def stock_input():
 
         for item in items:
             field_name = f"stock_{item['id']}"
-            stock_text = request.form.get(field_name, "").strip()
+            stock_text = request.form.get(
+                field_name,
+                ""
+            ).strip()
 
             # 空欄はスキップ
             if stock_text == "":
@@ -214,7 +203,6 @@ def stock_input():
             ORDER BY id
             """
         )
-
         updated_items = cursor.fetchall()
 
         # -------------------------

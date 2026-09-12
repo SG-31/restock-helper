@@ -1,13 +1,20 @@
 import sqlite3
 
+from flask import render_template
 from flask import Flask
-
+from db import get_connection
 from routes.items import items_bp
 from routes.stock import stock_bp
-import db
+from routes.shopping import shopping_bp
 
 
 app = Flask(__name__)
+
+
+# トップ案内画面
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
 # =========================
@@ -19,7 +26,7 @@ def init_db():
 
     try:
         # DBに接続
-        connection = db.get_connection()
+        connection = get_connection()
 
         # itemsテーブル
         connection.execute("""
@@ -76,7 +83,7 @@ def init_db():
 
 app.register_blueprint(items_bp)
 app.register_blueprint(stock_bp)
-
+app.register_blueprint(shopping_bp)
 
 # =========================
 # アプリ起動

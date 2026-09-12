@@ -1,0 +1,95 @@
+body {
+    font-size: 20px;
+    line-height: 1.8;
+    margin: 24px;
+}
+
+h1 {
+    margin-bottom: 24px;
+}
+
+h2 {
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+ul {
+    padding-left: 28px;
+}
+
+.shopping-item,
+.memo-item {
+    margin-bottom: 14px;
+}
+
+.item-name {
+    font-weight: bold;
+}
+
+.required-quantity {
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.memo-text {
+    font-weight: bold;
+}
+
+button {
+    font-size: 18px;
+    padding: 8px 16px;
+    min-height: 44px;
+}
+
+input[type="text"] {
+    font-size: 20px;
+    padding: 8px;
+    min-height: 44px;
+}
+
+/* セクションを分かりやすく区切る */
+h2 {
+    background-color: #f0f4f6;
+    border-left: 6px solid #9aa7b0;
+    padding: 8px 12px;
+    margin-top: 48px;
+    margin-bottom: 12px;
+}
+
+/* セクション内の項目は詰めすぎず、適度に配置 */
+ul {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.shopping-item,
+.memo-item {
+    margin-bottom: 8px;
+}
+
+/* 品目名を少し目立たせる */
+.item-name,
+.memo-text {
+    font-weight: bold;
+}
+
+/* 必要数量を見分けやすくする */
+.required-quantity {
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+/* 入力欄と追加ボタンを押しやすくする */
+input[type="text"] {
+    width: 280px;
+    min-height: 44px;
+    font-size: 20px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+button {
+    min-height: 44px;
+    font-size: 18px;
+    padding: 8px 16px;
+}

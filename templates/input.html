@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>在庫入力</title>
+
+    <style>
+        /* 入力値を変更した行を目立たせる */
+        .changed-row {
+            background-color: #fff4cc;
+        }
+    </style>
 </head>
 <body>
 
 <h1>在庫入力</h1>
+
+<p><a href="/">トップに戻る</a></p>
 
 {% if error %}
     <p>{{ error }}</p>
@@ -27,7 +36,10 @@
 
 {% if items %}
 
-<form method="post">
+<form
+    method="post"
+    onsubmit="return confirmSave(this);"
+>
 
     <table border="1">
         <tr>
@@ -46,6 +58,7 @@
                     name="stock_{{ item['id'] }}"
                     value="{{ item['current_stock'] }}"
                     min="0"
+                    onchange="this.closest('tr').classList.add('changed-row')"
                 >
             </td>
         </tr>
@@ -55,7 +68,7 @@
 
     <br>
 
-    <button type="submit">保存</button>
+    <button type="submit" id="save-button">保存</button>
 
 </form>
 
@@ -85,5 +98,33 @@
 
 {% endif %}
 
+<script>
+    function confirmSave(form) {
+        const confirmed = confirm(
+            "今週分として更新しますが、よいですか？"
+        );
+
+        if (!confirmed) {
+            return false;
+        }
+
+        const saveButton = document.getElementById("save-button");
+
+        saveButton.disabled = true;
+        saveButton.textContent = "保存中...";
+
+        return true;
+    }
+</script>
+
 </body>
+
+<form
+    method="POST"
+    action="/input/complete"
+    onsubmit="return confirm('表示された数量を購入しましたか？購入した場合は［完了］を押してください。');"
+>
+    <button type="submit">買い物完了</button>
+</form>
+
 </html>
