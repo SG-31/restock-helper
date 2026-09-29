@@ -22,3 +22,21 @@ def calc_required_quantity(moving_average, current_stock):
 
     # 補充が必要な場合は、必要数を整数に切り上げる。
     return math.ceil(max(0, required))
+
+
+def calc_restock_info(item, consumption_values):
+    """品目情報と消費量から補充情報をまとめて計算する。"""
+    moving_average = calc_moving_average(consumption_values)
+
+    # 消費量データがない品目は計算対象外とする
+    if moving_average is None:
+        return None
+
+    required_quantity = calc_required_quantity(moving_average, item["current_stock"])
+
+    return {
+        "id": item["id"],
+        "name": item["name"],
+        "unit": item["unit"],
+        "restock_amount": required_quantity,
+    }
