@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 import db
 
 
@@ -29,11 +29,12 @@ def shopping_list():
 
     except sqlite3.Error as error:
         print(f"買い物リストの取得エラー: {error}")
+
         return render_template(
             "list.html",
             shopping_items=[],
             memos=[],
-            error=f"買い物リストを取得できませんでした。DBエラー: {error}",
+            error="買い物リストを取得できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -59,11 +60,12 @@ def add_memo():
 
     except sqlite3.Error as error:
         print(f"買ってほしいものの登録エラー: {error}")
+
         return render_template(
             "list.html",
             shopping_items=[],
             memos=[],
-            error=f"買ってほしいものを登録できませんでした。DBエラー: {error}",
+            error="買ってほしいものを登録できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -87,11 +89,12 @@ def delete_memo(memo_id):
 
     except sqlite3.Error as error:
         print(f"買ってほしいものの削除エラー: {error}")
+
         return render_template(
             "list.html",
             shopping_items=[],
             memos=[],
-            error=f"買ってほしいものを削除できませんでした。DBエラー: {error}",
+            error="買ってほしいものを削除できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -122,8 +125,14 @@ def complete_shopping():
                 """
             )
 
+            flash("買い物が完了しました。")
             return redirect("/input")
 
     except sqlite3.Error as error:
         print(f"買い物完了処理のエラー: {error}")
-        return f"買い物完了処理に失敗しました。DBエラー: {error}", 500
+
+        flash(
+            "買い物完了処理に失敗しました。しばらくしてから、もう一度お試しください。",
+            "error",
+        )
+    return redirect("/input")

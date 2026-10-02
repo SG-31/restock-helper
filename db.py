@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from contextlib import contextmanager
 
@@ -7,6 +8,10 @@ DATABASE = "database/restock.db"
 
 def get_connection():
     """SQLiteへの接続を作成する。"""
+
+    # DBファイルを保存するフォルダがなければ作成する
+    os.makedirs("database", exist_ok=True)
+
     connection = sqlite3.connect(DATABASE)
 
     # カラム名でデータを取得できるようにする

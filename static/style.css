@@ -93,3 +93,8 @@ button {
     font-size: 18px;
     padding: 8px 16px;
 }
+
+/* 在庫入力欄のプレースホルダーを薄く表示 */
+input::placeholder {
+    color: #ccc;
+}

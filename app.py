@@ -12,6 +12,12 @@ from routes.shopping import shopping_bp
 
 app = Flask(__name__)
 
+# セッション・flashメッセージ用の秘密鍵
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "development-secret-key",
+)
+
 
 # トップ案内画面
 @app.route("/")

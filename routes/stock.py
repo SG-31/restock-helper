@@ -1,6 +1,6 @@
 import sqlite3
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, redirect
 
 import db
 
@@ -34,16 +34,19 @@ def stock_input():
             # GET：入力画面を表示
             # -------------------------
             if request.method == "GET":
+                shopping_list = db.get_shopping_list(connection)
+
                 return render_template(
                     "input.html",
                     items=items,
-                    shopping_list=[],
+                    shopping_list=shopping_list,
                 )
 
             # -------------------------
             # POST：在庫を更新
             # -------------------------
             warnings = []
+            updated_count = 0
 
             for item in items:
                 field_name = f"stock_{item['id']}"
@@ -96,31 +99,30 @@ def stock_input():
                     (current_stock, item["id"]),
                 )
 
-            # -------------------------
-            # 更新後の品目を再取得
-            # -------------------------
-            updated_items = db.get_items(connection)
+                # 実際に保存した品目数をカウント
+                updated_count += 1
 
             # -------------------------
-            # 更新後の買い物リストを取得
+            # Flashメッセージを登録
             # -------------------------
-            shopping_list = db.get_shopping_list(connection)
+            if updated_count > 0:
+                flash("在庫を更新しました。")
+            else:
+                flash("更新された品目はありませんでした。")
 
-            return render_template(
-                "input.html",
-                items=updated_items,
-                shopping_list=shopping_list,
-                message="在庫を更新しました。",
-                warnings=warnings,
-            )
+            for warning in warnings:
+                flash(warning, "warning")
+
+            # POST処理完了後はGETへリダイレクトする
+            return redirect("/input")
 
     except sqlite3.Error as error:
-        # DBエラーは握りつぶさず表示する
         print(f"在庫入力のDBエラー: {error}")
 
-        return render_template(
-            "input.html",
-            items=[],
-            shopping_list=[],
-            error=f"在庫を更新できませんでした。DBエラー: {error}",
+        # DBエラーもFlashで通知してGETへリダイレクトする
+        flash(
+            "在庫を更新できませんでした。しばらくしてから、もう一度お試しください。",
+            "error",
         )
+
+        return redirect("/input")

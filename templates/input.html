@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 
 <head>
-
     <meta charset="UTF-8">
-
     <title>在庫入力</title>
-
     <style>
         /* 入力値を変更した行を目立たせる */
         .changed-row {
             background-color: #fff4cc;
         }
-    </style>
 
+        /* 買い物リストへのリンクは通常の本文サイズにする */
+        .shopping-list-link {
+            font-size: 20px;
+            font-weight: normal;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,29 +24,21 @@
 
     <p><a href="/">トップに戻る</a></p>
 
-    {% if error %}
-    <p>{{ error }}</p>
-    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
-    {% if message %}
+    <!-- ① 更新メッセージ・警告 -->
+    {% if messages %}
+    {% for category, message in messages %}
     <p>{{ message }}</p>
+    {% endfor %}
     {% endif %}
 
-    {% if warnings %}
-    <h2>入力内容を確認してください</h2>
-    <ul>
-        {% for warning in warnings %}
-        <li>{{ warning }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
 
+    <!-- ② 在庫入力欄 -->
     {% if items %}
-
     <form method="post" onsubmit="return confirmSave(this);">
 
         <table border="1">
-
             <tr>
                 <th>品目名</th>
                 <th>単位</th>
@@ -53,66 +46,68 @@
             </tr>
 
             {% for item in items %}
-
             <tr>
-
                 <td>{{ item["name"] }}</td>
-
                 <td>{{ item["unit"] }}</td>
-
                 <td>
                     <input type="number" name="stock_{{ item['id'] }}" placeholder="{{ item['current_stock'] }}" min="0"
                         onchange="this.closest('tr').classList.add('changed-row')">
                 </td>
-
             </tr>
-
             {% endfor %}
-
         </table>
 
         <br>
 
-        <button type="submit" id="save-button">保存</button>
+        <button type="submit" id="save-button">在庫保存</button>
 
     </form>
-
     {% endif %}
 
 
+    <!-- ③ 買い物リスト -->
+    <h2>
+        買い物リスト
+        <a href="/list" class="shopping-list-link">
+            （買い物リストを見る）
+        </a>
+    </h2>
+
     {% if shopping_list %}
 
-    <h2>買い物リスト</h2>
-
     <table border="1">
-
         <tr>
             <th>品目名</th>
             <th>補充必要数</th>
         </tr>
 
         {% for item in shopping_list %}
-
         <tr>
-
             <td>{{ item["name"] }}</td>
-
             <td>
                 {{ item["restock_amount"] }} {{ item["unit"] }}
             </td>
-
         </tr>
-
         {% endfor %}
-
     </table>
+
+    {% else %}
+
+    <p>補充が必要なものはありません。</p>
 
     {% endif %}
 
 
+    <!-- ④ 買い物完了ボタン -->
+    <!-- shopping_list の有無には関係なく表示する -->
+    <form method="POST" action="/input/complete" onsubmit="return confirm('今週分として更新しますが、よいですか？');">
+        <button type="submit">買い物完了</button>
+    </form>
+
+    {% endwith %}
+
     <script>
         function confirmSave(form) {
-
             const confirmed = confirm(
                 "今週分として更新しますが、よいですか？"
             );
@@ -122,18 +117,12 @@
             }
 
             const saveButton = document.getElementById("save-button");
-
             saveButton.disabled = true;
             saveButton.textContent = "保存中...";
 
             return true;
         }
     </script>
-
-
-    <form method="POST" action="/input/complete" onsubmit="return confirm('今週分として更新しますが、よいですか？');">
-        <button type="submit">買い物完了</button>
-    </form>
 
 </body>
 

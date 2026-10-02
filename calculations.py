@@ -32,7 +32,14 @@ def calc_restock_info(item, consumption_values):
     if moving_average is None:
         return None
 
-    required_quantity = calc_required_quantity(moving_average, item["current_stock"])
+    required_quantity = calc_required_quantity(
+        moving_average,
+        item["current_stock"],
+    )
+
+    # 補充不要な品目は買い物リストに追加しない
+    if required_quantity <= 0:
+        return None
 
     return {
         "id": item["id"],

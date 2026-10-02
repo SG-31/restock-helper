@@ -30,7 +30,7 @@ def items():
         return render_template(
             "items.html",
             items=[],
-            error=f"管理品目一覧を取得できませんでした。DBエラー: {error}",
+            error="管理品目一覧を取得できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -53,6 +53,22 @@ def new_item():
     name = request.form.get("name", "").strip()
     unit = request.form.get("unit", "").strip()
     stock_text = request.form.get("current_stock", "").strip()
+
+    # 品目名・単位の入力チェック
+    for field_value, field_label in [(name, "品目名"), (unit, "単位")]:
+        if not field_value:
+            return render_template(
+                "item_form.html",
+                error=f"{field_label}を入力してください。",
+                action_url="/items/new",
+            )
+
+        if len(field_value) > 100:
+            return render_template(
+                "item_form.html",
+                error=f"{field_label}は100文字以内で入力してください。",
+                action_url="/items/new",
+            )
 
     # 初期在庫数を整数に変換する
     try:
@@ -96,7 +112,7 @@ def new_item():
 
         return render_template(
             "item_form.html",
-            error=f"管理品目を登録できませんでした。DBエラー: {error}",
+            error="管理品目を登録できませんでした。しばらくしてから、もう一度お試しください。",
             action_url="/items/new",
         )
 
@@ -134,6 +150,24 @@ def edit_item(item_id):
             name = request.form.get("name", "").strip()
             unit = request.form.get("unit", "").strip()
             stock_text = request.form.get("current_stock", "").strip()
+
+            # 品目名・単位の入力チェック
+            for field_value, field_label in [(name, "品目名"), (unit, "単位")]:
+                if not field_value:
+                    return render_template(
+                        "item_form.html",
+                        item=item,
+                        action_url=f"/items/{item_id}/edit",
+                        error=f"{field_label}を入力してください。",
+                    )
+
+                if len(field_value) > 100:
+                    return render_template(
+                        "item_form.html",
+                        item=item,
+                        action_url=f"/items/{item_id}/edit",
+                        error=f"{field_label}は100文字以内で入力してください。",
+                    )
 
             # 現在庫数を整数に変換する
             try:
@@ -186,7 +220,7 @@ def edit_item(item_id):
             "item_form.html",
             item=None,
             action_url=f"/items/{item_id}/edit",
-            error=f"管理品目を変更できませんでした。DBエラー: {error}",
+            error="管理品目を変更できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -231,5 +265,5 @@ def delete_item(item_id):
         return render_template(
             "items.html",
             items=[],
-            error=f"管理品目を削除できませんでした。DBエラー: {error}",
+            error="管理品目を削除できませんでした。しばらくしてから、もう一度お試しください。",
         )
