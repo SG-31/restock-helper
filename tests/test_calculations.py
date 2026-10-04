@@ -211,3 +211,11 @@ def test_calc_restock_info_does_not_use_required_quantity_key():
     result = calc_restock_info(item, [2, 2])
 
     assert "required_quantity" not in result
+
+
+def test_calc_required_quantity_rounds_up_even_below_half():
+    # decisions.md 3-8：小数点以下が0.5未満でも切り上げる
+    # 移動平均1.5×1.5＝2.25 → 切り上げて3（四捨五入なら2になるため、両者を区別できる）
+    result = calc_required_quantity(1.5, 0)
+
+    assert result == 3
