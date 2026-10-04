@@ -45,6 +45,10 @@ def add_memo():
     if not text:
         return redirect("/list")
 
+    if len(text) > 100:
+        flash("買ってほしいものは100文字以内で入力してください。", "warning")
+        return redirect("/list")
+
     try:
         # DB接続とトランザクションをコンテキストマネージャで管理する
         with db.get_connection_context() as connection:

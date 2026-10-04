@@ -17,6 +17,14 @@
     <p>{{ error }}</p>
     {% endif %}
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <h2>補充が必要なもの</h2>
 
     {% if shopping_items %}
@@ -57,7 +65,7 @@
     <h2>買ってほしいものを追加</h2>
 
     <form method="POST" action="/list/memo">
-        <input type="text" name="text">
+        <input type="text" name="text" maxlength="100">
         <button type="submit">追加</button>
     </form>
 

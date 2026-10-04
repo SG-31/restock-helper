@@ -68,7 +68,7 @@ def get_consumptions(connection, item_id):
         SELECT consumption
         FROM consumptions
         WHERE item_id = ?
-        ORDER BY recorded_at DESC
+        ORDER BY recorded_at DESC, id DESC
         LIMIT 4
         """,
         (item_id,),
