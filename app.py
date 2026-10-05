@@ -3,6 +3,7 @@ import sqlite3
 
 from flask import render_template
 from flask import Flask
+from flask_wtf.csrf import CSRFError, CSRFProtect
 
 from db import get_connection_context
 
@@ -18,11 +19,38 @@ app.secret_key = os.getenv(
     "development-secret-key",
 )
 
+# CSRF攻撃を防止する
+csrf = CSRFProtect(app)
+
+# ヘルパーが在庫を数えている間にトークンが期限切れにならないよう、
+# CSRFトークンの有効期限をなくす
+app.config["WTF_CSRF_TIME_LIMIT"] = None
+
 
 # トップ案内画面
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+    print(f"CSRFエラー: {error.description}")
+    html = """
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>操作エラー</title>
+    </head>
+    <body>
+        <h1>操作できませんでした</h1>
+        <p>画面の有効期限が切れたか、送信内容を確認できませんでした。画面を開き直してから、もう一度操作してください。</p>
+        <p><a href="/">トップに戻る</a></p>
+    </body>
+    </html>
+    """
+    return html, 400
 
 
 # =========================

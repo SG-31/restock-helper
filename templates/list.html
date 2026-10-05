@@ -52,6 +52,7 @@
             <span class="memo-text">{{ memo["text"] }}</span>
 
             <form method="POST" action="/list/memo/{{ memo['id'] }}/delete" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">削除</button>
             </form>
         </li>
@@ -65,6 +66,7 @@
     <h2>買ってほしいものを追加</h2>
 
     <form method="POST" action="/list/memo">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="text" maxlength="100">
         <button type="submit">追加</button>
     </form>

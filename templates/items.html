@@ -6,9 +6,9 @@
     <title>管理品目一覧</title>
 </head>
 
-<body>   
+<body>
     <h1>管理品目一覧</h1>
-    
+
     <p><a href="/">トップに戻る</a></p>
 
     {% if error %}
@@ -34,6 +34,7 @@
 
                 <form method="POST" action="/items/{{ item['id'] }}/delete" style="display:inline"
                     onsubmit="return confirm('削除すると、この品目の過去の消費量データも消えます。よろしいですか？');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit">削除</button>
                 </form>
             </td>

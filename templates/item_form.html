@@ -8,7 +8,7 @@
 
 <body>
     <p><a href="/">トップに戻る</a></p>
-    
+
     {% if item %}
     <h1>管理品目編集</h1>
     {% else %}
@@ -24,6 +24,7 @@
     {% endif %}
 
     <form method="POST" action="{{ action_url }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div>
             <label for="name">品目名</label>

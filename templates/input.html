@@ -37,8 +37,10 @@
     <!-- ② 在庫入力欄 -->
     {% if items %}
     <form method="post" onsubmit="return confirmSave(this);">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <table border="1">
+
             <tr>
                 <th>品目名</th>
                 <th>単位</th>
@@ -101,6 +103,7 @@
     <!-- ④ 買い物完了ボタン -->
     <!-- shopping_list の有無には関係なく表示する -->
     <form method="POST" action="/input/complete" onsubmit="return confirm('今週分として更新しますが、よいですか？');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit">買い物完了</button>
     </form>
 
