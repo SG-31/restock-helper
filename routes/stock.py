@@ -70,6 +70,12 @@ def stock_input():
                     )
                     continue
 
+                if current_stock > 9999:
+                    warnings.append(
+                        f"{item['name']}：在庫数は9999以下で入力してください。"
+                    )
+                    continue
+
                 # -------------------------
                 # 前回値を取得
                 # -------------------------

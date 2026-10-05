@@ -41,6 +41,7 @@ def handle_csrf_error(error):
     <html lang="ja">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>操作エラー</title>
     </head>
     <body>

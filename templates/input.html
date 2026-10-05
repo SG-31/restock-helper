@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>在庫入力</title>
     <style>
         /* 入力値を変更した行を目立たせる */
@@ -53,7 +54,7 @@
                 <td>{{ item["unit"] }}</td>
                 <td>
                     <input type="number" name="stock_{{ item['id'] }}" placeholder="{{ item['current_stock'] }}" min="0"
-                        onchange="this.closest('tr').classList.add('changed-row')">
+                        max="9999" onchange="this.closest('tr').classList.add('changed-row')">
                 </td>
             </tr>
             {% endfor %}
@@ -102,7 +103,7 @@
 
     <!-- ④ 買い物完了ボタン -->
     <!-- shopping_list の有無には関係なく表示する -->
-    <form method="POST" action="/input/complete" onsubmit="return confirm('今週分として更新しますが、よいですか？');">
+    <form method="POST" action="/input/complete" onsubmit="return confirm('今週分として更新します。「買ってほしいもの」の一覧も消えますが、よいですか？');">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit">買い物完了</button>
     </form>
