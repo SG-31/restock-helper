@@ -1,7 +1,6 @@
 import sqlite3
-
-from flask import Blueprint, render_template, request, redirect
-
+from flask import Blueprint, render_template, request, redirect, flash
+from validation import validate_item_form
 import db
 
 
@@ -48,72 +47,73 @@ def new_item():
             "item_form.html",
             action_url="/items/new",
         )
+    # 送信された値をフォームに残すために保持する
+    form_data = {
+        "name": request.form.get("name", ""),
+        "unit": request.form.get("unit", ""),
+        "current_stock": request.form.get("current_stock", ""),
+    }
 
-    # POSTの場合：フォームから送信されたデータを保存する
-    name = request.form.get("name", "").strip()
-    unit = request.form.get("unit", "").strip()
-    stock_text = request.form.get("current_stock", "").strip()
+    # フォーム入力を共通関数で検証する
+    validated_data, error = validate_item_form(request.form)
 
-    # 品目名・単位の入力チェック
-    for field_value, field_label in [(name, "品目名"), (unit, "単位")]:
-        if not field_value:
-            return render_template(
-                "item_form.html",
-                error=f"{field_label}を入力してください。",
-                action_url="/items/new",
-            )
-
-        if len(field_value) > 100:
-            return render_template(
-                "item_form.html",
-                error=f"{field_label}は100文字以内で入力してください。",
-                action_url="/items/new",
-            )
-
-    # 初期在庫数を整数に変換する
-    try:
-        current_stock = int(stock_text)
-
-    except ValueError:
+    if error:
         return render_template(
             "item_form.html",
-            error="初期在庫数は整数で入力してください。",
+            form_data=form_data,
+            item=None,
             action_url="/items/new",
-        )
-
-    # 初期在庫数がマイナスの場合は保存しない
-    if current_stock < 0:
-        return render_template(
-            "item_form.html",
-            error="初期在庫数は0以上で入力してください。",
-            action_url="/items/new",
+            error=error,
         )
 
     try:
-        # DB接続とトランザクションをコンテキストマネージャで管理する
         with db.get_connection_context() as connection:
-            # itemsテーブルに新しい品目を登録
+            # 品目名の重複を確認
+            if db.item_name_exists(connection, validated_data["name"]):
+                return render_template(
+                    "item_form.html",
+                    form_data=form_data,
+                    item=None,
+                    action_url="/items/new",
+                    error="同じ品目名がすでに登録されています。",
+                )
+
+            # 管理品目を登録する
             connection.execute(
                 """
                 INSERT INTO items (name, unit, current_stock)
                 VALUES (?, ?, ?)
                 """,
-                (name, unit, current_stock),
+                (
+                    validated_data["name"],
+                    validated_data["unit"],
+                    validated_data["current_stock"],
+                ),
             )
 
-            return render_template(
-                "item_form.html",
-                message="管理品目を登録しました。",
-                action_url="/items/new",
-            )
+        # 登録情報をFlashに保存して一覧画面へ移動する
+        flash("管理品目を登録しました。")
+        return redirect("/items")
+
+    except sqlite3.IntegrityError:
+        # UNIQUE制約などによる重複エラー
+        return render_template(
+            "item_form.html",
+            form_data=form_data,
+            item=None,
+            action_url="/items/new",
+            error="同じ品目名がすでに登録されています。",
+        )
 
     except sqlite3.Error as error:
-        print(f"管理品目の登録エラー: {error}")
+        print(f"管理品目の登録エラー：{error}")
 
         return render_template(
             "item_form.html",
-            error="管理品目を登録できませんでした。しばらくしてから、もう一度お試しください。",
+            form_data=form_data,
+            item=None,
             action_url="/items/new",
+            error="管理品目を登録できませんでした。しばらくしてから、もう一度お試しください。",
         )
 
 
@@ -127,6 +127,9 @@ def new_item():
     methods=["GET", "POST"],
 )
 def edit_item(item_id):
+
+    item = None
+    form_data = None
 
     try:
         # DB接続とトランザクションをコンテキストマネージャで管理する
@@ -146,51 +149,40 @@ def edit_item(item_id):
                     action_url=f"/items/{item_id}/edit",
                 )
 
-            # POSTの場合：フォームから送信されたデータを取得
-            name = request.form.get("name", "").strip()
-            unit = request.form.get("unit", "").strip()
-            stock_text = request.form.get("current_stock", "").strip()
+            # 送信された値をフォームに残すために保持する
+            form_data = {
+                "name": request.form.get("name", ""),
+                "unit": request.form.get("unit", ""),
+                "current_stock": request.form.get("current_stock", ""),
+            }
 
-            # 品目名・単位の入力チェック
-            for field_value, field_label in [(name, "品目名"), (unit, "単位")]:
-                if not field_value:
-                    return render_template(
-                        "item_form.html",
-                        item=item,
-                        action_url=f"/items/{item_id}/edit",
-                        error=f"{field_label}を入力してください。",
-                    )
+            # フォーム入力を共通関数で検証する
+            validated_data, error = validate_item_form(request.form)
 
-                if len(field_value) > 100:
-                    return render_template(
-                        "item_form.html",
-                        item=item,
-                        action_url=f"/items/{item_id}/edit",
-                        error=f"{field_label}は100文字以内で入力してください。",
-                    )
-
-            # 現在庫数を整数に変換する
-            try:
-                current_stock = int(stock_text)
-
-            except ValueError:
+            if error:
                 return render_template(
                     "item_form.html",
                     item=item,
+                    form_data=form_data,
                     action_url=f"/items/{item_id}/edit",
-                    error="現在庫数は整数で入力してください。",
+                    error=error,
                 )
 
-            # 現在庫数がマイナスの場合は更新しない
-            if current_stock < 0:
+            # 品目名の重複チェック
+            if db.item_name_exists(
+                connection,
+                validated_data["name"],
+                item_id,
+            ):
                 return render_template(
                     "item_form.html",
                     item=item,
+                    form_data=form_data,
                     action_url=f"/items/{item_id}/edit",
-                    error="現在庫数は0以上で入力してください。",
+                    error="同じ品目名がすでに登録されています。",
                 )
 
-            # 管理品目を更新
+            # 管理品目を更新する
             connection.execute(
                 """
                 UPDATE items
@@ -200,25 +192,35 @@ def edit_item(item_id):
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 """,
-                (name, unit, current_stock, item_id),
+                (
+                    validated_data["name"],
+                    validated_data["unit"],
+                    validated_data["current_stock"],
+                    item_id,
+                ),
             )
 
-            # 更新後の値を取得
-            updated_item = db.get_item(connection, item_id)
+        # 更新成功をFlashに保存して一覧画面へ移動する
+        flash("管理品目を変更しました。")
+        return redirect("/items")
 
-            return render_template(
-                "item_form.html",
-                item=updated_item,
-                action_url=f"/items/{item_id}/edit",
-                message="管理品目を変更しました。",
-            )
+    except sqlite3.IntegrityError:
+        # UNIQUE制約などによる重複エラー
+        return render_template(
+            "item_form.html",
+            item=item,
+            form_data=form_data,
+            action_url=f"/items/{item_id}/edit",
+            error="同じ品目名がすでに登録されています。",
+        )
 
     except sqlite3.Error as error:
         print(f"管理品目の変更エラー: {error}")
 
         return render_template(
             "item_form.html",
-            item=None,
+            item=item,
+            form_data=form_data,
             action_url=f"/items/{item_id}/edit",
             error="管理品目を変更できませんでした。しばらくしてから、もう一度お試しください。",
         )

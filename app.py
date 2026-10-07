@@ -67,13 +67,13 @@ def init_db():
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS items (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
+                    name TEXT NOT NULL UNIQUE,
                     unit TEXT NOT NULL,
                     current_stock INTEGER NOT NULL CHECK (current_stock >= 0),
                     created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
-                )
-            """)
+                    )
+                    """)
 
             # consumptionsテーブル
             connection.execute("""

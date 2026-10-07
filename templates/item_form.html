@@ -28,13 +28,16 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div>
-            <label for="name">品目名</label>
-            <input type="text" id="name" name="name" value="{{ item['name'] if item else '' }}" required>
+            <input type="text" id="name" name="name"
+                value="{{ form_data['name'] if form_data else (item['name'] if item else '') }}" maxlength="100"
+                required>
         </div>
 
         <div>
             <label for="unit">単位</label>
-            <input type="text" id="unit" name="unit" value="{{ item['unit'] if item else '' }}" required>
+            <input type="text" id="unit" name="unit"
+                value="{{ form_data['unit'] if form_data else (item['unit'] if item else '') }}" maxlength="100"
+                required>
         </div>
 
         <div>
@@ -46,7 +49,8 @@
                 {% endif %}
             </label>
             <input type="number" id="current_stock" name="current_stock"
-                value="{{ item['current_stock'] if item else '' }}" required>
+                value="{{ form_data['current_stock'] if form_data else (item['current_stock'] if item else '') }}"
+                min="0" max="9999" required>
         </div>
 
         {% if item %}

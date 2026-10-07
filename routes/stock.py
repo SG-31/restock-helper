@@ -1,7 +1,6 @@
 import sqlite3
-
 from flask import Blueprint, render_template, request, flash, redirect
-
+from validation import validate_stock
 import db
 
 
@@ -56,24 +55,11 @@ def stock_input():
                 if stock_text == "":
                     continue
 
-                # 整数に変換
-                try:
-                    current_stock = int(stock_text)
-                except ValueError:
-                    warnings.append(f"{item['name']}：在庫数は整数で入力してください。")
-                    continue
+                # 在庫数の検証は共通関数に任せる
+                current_stock, error = validate_stock(stock_text)
 
-                # マイナス値は保存しない
-                if current_stock < 0:
-                    warnings.append(
-                        f"{item['name']}：在庫数は0以上で入力してください。"
-                    )
-                    continue
-
-                if current_stock > 9999:
-                    warnings.append(
-                        f"{item['name']}：在庫数は9999以下で入力してください。"
-                    )
+                if error:
+                    warnings.append(f"{item['name']}：{error}")
                     continue
 
                 # -------------------------

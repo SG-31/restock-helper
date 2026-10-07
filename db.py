@@ -100,3 +100,30 @@ def get_shopping_list(connection):
     """現在の補充必要数から買い物リストを取得する。"""
     items = get_items(connection)
     return build_restock_list(connection, items)
+
+
+def item_name_exists(connection, name, item_id=None):
+    """指定した名前の管理品目が存在するか確認する。"""
+    if item_id is None:
+        row = connection.execute(
+            """
+            SELECT 1
+            FROM items
+            WHERE TRIM(name) = ?
+            LIMIT 1
+            """,
+            (name,),
+        ).fetchone()
+    else:
+        row = connection.execute(
+            """
+            SELECT 1
+            FROM items
+            WHERE TRIM(name) = ?
+              AND id != ?
+            LIMIT 1
+            """,
+            (name, item_id),
+        ).fetchone()
+
+    return row is not None
