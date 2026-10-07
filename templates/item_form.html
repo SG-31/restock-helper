@@ -20,14 +20,12 @@
     <p>{{ error }}</p>
     {% endif %}
 
-    {% if message %}
-    <p>{{ message }}</p>
-    {% endif %}
 
     <form method="POST" action="{{ action_url }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div>
+            <label for="name">品目名</label>
             <input type="text" id="name" name="name"
                 value="{{ form_data['name'] if form_data else (item['name'] if item else '') }}" maxlength="100"
                 required>
