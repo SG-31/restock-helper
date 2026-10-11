@@ -1,6 +1,6 @@
 import os
-import sqlite3
-
+import psycopg
+from dotenv import load_dotenv
 from flask import render_template
 from flask import Flask
 from flask_wtf.csrf import CSRFError, CSRFProtect
@@ -10,6 +10,10 @@ from db import get_connection_context
 from routes.items import items_bp
 from routes.stock import stock_bp
 from routes.shopping import shopping_bp
+
+
+# ローカル開発では.envから環境変数を読み込む
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -66,22 +70,22 @@ def init_db():
             # itemsテーブル
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS items (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                     name TEXT NOT NULL UNIQUE,
                     unit TEXT NOT NULL,
                     current_stock INTEGER NOT NULL CHECK (current_stock >= 0),
-                    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-                    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
-                    )
-                    """)
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
 
             # consumptionsテーブル
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS consumptions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                     item_id INTEGER NOT NULL,
                     consumption INTEGER NOT NULL CHECK (consumption >= 0),
-                    recorded_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+                    recorded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
                 )
             """)
@@ -89,16 +93,16 @@ def init_db():
             # shopping_memosテーブル
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS shopping_memos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                     text TEXT NOT NULL,
-                    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
             """)
 
         print("DB初期化が完了しました。")
         return True
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         # DB関連のエラー内容を表示
         print(f"DB初期化エラー: {error}")
         return False

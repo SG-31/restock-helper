@@ -1,7 +1,6 @@
-import sqlite3
+import psycopg
 from flask import Blueprint, render_template, request, redirect, flash
 import db
-
 
 shopping_bp = Blueprint("shopping", __name__)
 
@@ -27,7 +26,7 @@ def shopping_list():
                 memos=memos,
             )
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"買い物リストの取得エラー: {error}")
 
         return render_template(
@@ -55,14 +54,14 @@ def add_memo():
             connection.execute(
                 """
                 INSERT INTO shopping_memos (text)
-                VALUES (?)
+                VALUES (%s)
                 """,
                 (text,),
             )
 
             return redirect("/list")
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"買ってほしいものの登録エラー: {error}")
 
         return render_template(
@@ -81,7 +80,7 @@ def delete_memo(memo_id):
             cursor = connection.execute(
                 """
                 DELETE FROM shopping_memos
-                WHERE id = ?
+                WHERE id = %s
                 """,
                 (memo_id,),
             )
@@ -91,7 +90,7 @@ def delete_memo(memo_id):
 
             return redirect("/list")
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"買ってほしいものの削除エラー: {error}")
 
         return render_template(
@@ -115,9 +114,9 @@ def complete_shopping():
                 connection.execute(
                     """
                     UPDATE items
-                    SET current_stock = current_stock + ?,
+                    SET current_stock = current_stock + %s,
                         updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
+                    WHERE id = %s
                     """,
                     (item["restock_amount"], item["id"]),
                 )
@@ -132,7 +131,7 @@ def complete_shopping():
             flash("買い物が完了しました。")
             return redirect("/input")
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"買い物完了処理のエラー: {error}")
 
         flash(

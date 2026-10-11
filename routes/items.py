@@ -1,8 +1,7 @@
-import sqlite3
+import psycopg
 from flask import Blueprint, render_template, request, redirect, flash
 from validation import validate_item_form
 import db
-
 
 items_bp = Blueprint("items", __name__)
 
@@ -23,7 +22,7 @@ def items():
             # HTMLにitemsを渡す
             return render_template("items.html", items=items)
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"管理品目一覧の取得エラー: {error}")
 
         return render_template(
@@ -82,7 +81,7 @@ def new_item():
             connection.execute(
                 """
                 INSERT INTO items (name, unit, current_stock)
-                VALUES (?, ?, ?)
+                VALUES (%s, %s, %s)
                 """,
                 (
                     validated_data["name"],
@@ -95,7 +94,7 @@ def new_item():
         flash("管理品目を登録しました。")
         return redirect("/items")
 
-    except sqlite3.IntegrityError:
+    except psycopg.IntegrityError:
         # UNIQUE制約などによる重複エラー
         return render_template(
             "item_form.html",
@@ -105,7 +104,7 @@ def new_item():
             error="同じ品目名がすでに登録されています。",
         )
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"管理品目の登録エラー：{error}")
 
         return render_template(
@@ -186,11 +185,11 @@ def edit_item(item_id):
             connection.execute(
                 """
                 UPDATE items
-                SET name = ?,
-                    unit = ?,
-                    current_stock = ?,
+                SET name = %s,
+                    unit = %s,
+                    current_stock = %s,
                     updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
+                WHERE id = %s
                 """,
                 (
                     validated_data["name"],
@@ -204,7 +203,7 @@ def edit_item(item_id):
         flash("管理品目を変更しました。")
         return redirect("/items")
 
-    except sqlite3.IntegrityError:
+    except psycopg.IntegrityError:
         # UNIQUE制約などによる重複エラー
         return render_template(
             "item_form.html",
@@ -214,7 +213,7 @@ def edit_item(item_id):
             error="同じ品目名がすでに登録されています。",
         )
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"管理品目の変更エラー: {error}")
 
         return render_template(
@@ -253,7 +252,7 @@ def delete_item(item_id):
             connection.execute(
                 """
                 DELETE FROM items
-                WHERE id = ?
+                WHERE id = %s
                 """,
                 (item_id,),
             )
@@ -261,7 +260,7 @@ def delete_item(item_id):
             # 管理品目一覧へ戻る
             return redirect("/items")
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"管理品目の削除エラー: {error}")
 
         return render_template(

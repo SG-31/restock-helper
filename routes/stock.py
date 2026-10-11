@@ -1,4 +1,4 @@
-import sqlite3
+import psycopg
 from flask import Blueprint, render_template, request, flash, redirect
 from validation import validate_stock
 import db
@@ -75,7 +75,7 @@ def stock_input():
                     """
                     INSERT INTO consumptions
                         (item_id, consumption)
-                    VALUES (?, ?)
+                    VALUES (%s, %s)
                     """,
                     (item["id"], consumption),
                 )
@@ -84,9 +84,9 @@ def stock_input():
                 connection.execute(
                     """
                     UPDATE items
-                    SET current_stock = ?,
+                    SET current_stock = %s,
                         updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
+                    WHERE id = %s
                     """,
                     (current_stock, item["id"]),
                 )
@@ -108,7 +108,7 @@ def stock_input():
             # POST処理完了後はGETへリダイレクトする
             return redirect("/input")
 
-    except sqlite3.Error as error:
+    except psycopg.Error as error:
         print(f"在庫入力のDBエラー: {error}")
 
         # DBエラーもFlashで通知してGETへリダイレクトする

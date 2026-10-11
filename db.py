@@ -1,26 +1,22 @@
 import os
-import sqlite3
 from contextlib import contextmanager
-
-
-DATABASE = "database/restock.db"
+import psycopg
+from psycopg.rows import dict_row
 
 
 def get_connection():
-    """SQLiteへの接続を作成する。"""
+    """PostgreSQLへの接続を作成する。"""
 
-    # DBファイルを保存するフォルダがなければ作成する
-    os.makedirs("database", exist_ok=True)
+    if "DATABASE_URL" not in os.environ or not os.environ["DATABASE_URL"].strip():
+        raise RuntimeError(
+            "環境変数 DATABASE_URL が設定されていません。"
+            ".envファイルにDATABASE_URLを設定してください。"
+        )
 
-    connection = sqlite3.connect(DATABASE)
-
-    # カラム名でデータを取得できるようにする
-    connection.row_factory = sqlite3.Row
-
-    # この接続でも外部キー制約を有効にする
-    connection.execute("PRAGMA foreign_keys = ON")
-
-    return connection
+    return psycopg.connect(
+        os.environ["DATABASE_URL"],
+        row_factory=dict_row,
+    )
 
 
 @contextmanager
@@ -31,7 +27,7 @@ def get_connection_context():
     try:
         yield connection
         connection.commit()
-    except sqlite3.Error:
+    except psycopg.Error:
         connection.rollback()
         raise
     finally:
@@ -55,7 +51,7 @@ def get_item(connection, item_id):
         """
         SELECT id, name, unit, current_stock
         FROM items
-        WHERE id = ?
+        WHERE id = %s
         """,
         (item_id,),
     ).fetchone()
@@ -67,7 +63,7 @@ def get_consumptions(connection, item_id):
         """
         SELECT consumption
         FROM consumptions
-        WHERE item_id = ?
+        WHERE item_id = %s
         ORDER BY recorded_at DESC, id DESC
         LIMIT 4
         """,
@@ -109,7 +105,7 @@ def item_name_exists(connection, name, item_id=None):
             """
             SELECT 1
             FROM items
-            WHERE TRIM(name) = ?
+            WHERE TRIM(name) = %s
             LIMIT 1
             """,
             (name,),
@@ -119,8 +115,8 @@ def item_name_exists(connection, name, item_id=None):
             """
             SELECT 1
             FROM items
-            WHERE TRIM(name) = ?
-              AND id != ?
+            WHERE TRIM(name) = %s
+              AND id != %s
             LIMIT 1
             """,
             (name, item_id),
