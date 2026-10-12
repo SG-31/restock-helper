@@ -15,13 +15,20 @@ from routes.shopping import shopping_bp
 # ローカル開発では.envから環境変数を読み込む
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="public/static",
+    static_url_path="/static",
+)
 
 # セッション・flashメッセージ用の秘密鍵
-app.secret_key = os.getenv(
-    "SECRET_KEY",
-    "development-secret-key",
-)
+secret_key = os.getenv("SECRET_KEY", "").strip()
+
+if not secret_key:
+    raise SystemExit("SECRET_KEYが設定されていないため、アプリを起動しません。")
+
+app.secret_key = secret_key
+
 
 # CSRF攻撃を防止する
 csrf = CSRFProtect(app)
@@ -102,8 +109,8 @@ def init_db():
         print("DB初期化が完了しました。")
         return True
 
-    except psycopg.Error as error:
-        # DB関連のエラー内容を表示
+    except (psycopg.Error, RuntimeError) as error:
+        # DB接続・初期化に失敗した原因を表示
         print(f"DB初期化エラー: {error}")
         return False
 
@@ -115,8 +122,13 @@ app.register_blueprint(items_bp)
 app.register_blueprint(stock_bp)
 app.register_blueprint(shopping_bp)
 
+
 # アプリ読み込み時にDBを初期化する
 db_initialized = init_db()
+
+if not db_initialized:
+    raise SystemExit("DBを利用できないため、アプリを起動しません。")
+
 
 # 環境変数でデバッグモードを切り替える
 debug_mode = os.getenv("FLASK_DEBUG", "").lower() == "true"
@@ -125,8 +137,4 @@ debug_mode = os.getenv("FLASK_DEBUG", "").lower() == "true"
 # アプリ起動
 # =========================
 if __name__ == "__main__":
-    # DB初期化に失敗したらFlaskを起動しない
-    if not db_initialized:
-        print("DBを利用できないため、Flaskサーバーを起動しません。")
-    else:
-        app.run(debug=debug_mode)
+    app.run(debug=debug_mode)
