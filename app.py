@@ -1,8 +1,18 @@
+import hmac
 import os
+from datetime import timedelta
+
 import psycopg
 from dotenv import load_dotenv
-from flask import render_template
-from flask import Flask
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_wtf.csrf import CSRFError, CSRFProtect
 
 from db import get_connection_context
@@ -30,8 +40,26 @@ if not secret_key:
 app.secret_key = secret_key
 
 
+# 共通ログインパスワードを環境変数から読み込む
+app_password = os.getenv("APP_PASSWORD", "").strip()
+
+# 未設定または空白のみの場合は起動を停止する
+# 比較に使用するパスワード自体は、前後の空白を削除しない
+if not app_password:
+    raise SystemExit("APP_PASSWORDが設定されていないため、アプリを起動しません。")
+
+
+# セッションCookieの設定
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+# VercelではHTTPS専用、ローカル開発ではHTTPでも使用できるようにする
+app.config["SESSION_COOKIE_SECURE"] = os.getenv("VERCEL") == "1"
+
+
 # CSRF攻撃を防止する
-csrf = CSRFProtect(app)
+# before_requestの順番を制御するため、初期化は後で行う
+csrf = CSRFProtect()
 
 # ヘルパーが在庫を数えている間にトークンが期限切れにならないよう、
 # CSRFトークンの有効期限をなくす
@@ -42,6 +70,76 @@ app.config["WTF_CSRF_TIME_LIMIT"] = None
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+# =========================
+# ログイン
+# =========================
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        password = request.form.get("password", "").strip()
+
+        # UTF-8に変換することで、日本語を含むパスワードにも対応する
+        # compare_digestで文字列を直接比較するより安全に比較する
+        if hmac.compare_digest(
+            password.encode("utf-8"),
+            app_password.encode("utf-8"),
+        ):
+            # 古いセッション情報を破棄してからログイン状態を設定する
+            session.clear()
+            session["logged_in"] = True
+            session.permanent = True
+
+            # ログイン後の移動先は常にトップ画面
+            return redirect(url_for("index"))
+
+        # パスワードが違う場合
+        # 入力値をテンプレートに渡さないため、入力欄は空になる
+        flash("パスワードが違います。", "error")
+
+    return render_template("login.html")
+
+
+# =========================
+# ログアウト
+# =========================
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    # ログイン状態を含むセッションを破棄する
+    session.clear()
+
+    # ログアウト後、ログイン画面で通知する
+    flash("ログアウトしました。")
+
+    return redirect(url_for("login"))
+
+
+# =========================
+# ログイン必須のアクセス制御
+# =========================
+
+
+@app.before_request
+def require_login():
+    # ログイン画面とFlaskの静的ファイルは対象外
+    if request.endpoint in {"login", "static"}:
+        return None
+
+    # ログイン済みでなければログイン画面へ移動
+    if session.get("logged_in") is not True:
+        return redirect(url_for("login"))
+
+    return None
+
+
+# アクセス制御を登録した後にCSRF保護を初期化する
+# これにより、ログイン確認がCSRF確認より先に実行される
+csrf.init_app(app)
 
 
 @app.errorhandler(CSRFError)

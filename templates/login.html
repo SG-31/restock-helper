@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ログイン | Restock Helper</title>
+</head>
+
+<body>
+
+    <h1>Restock Helper</h1>
+    <h2>ログイン</h2>
+
+    <!-- ログイン失敗・ログアウトなどの通知を表示する -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('login') }}" method="post">
+        <!-- Flask-WTFのCSRF保護に必要 -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label for="password">共通パスワード</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">ログイン</button>
+    </form>
+
+</body>
+
+</html>

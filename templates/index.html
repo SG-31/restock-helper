@@ -23,6 +23,13 @@
         </li>
     </ul>
 
+    <hr>
+
+    <form action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">ログアウト</button>
+    </form>
+
 </body>
 
 </html>
