@@ -8,4 +8,4 @@
 
 ## 設計の検討過程
 
-アプリ設計にあたっての検討過程・トレードオフの記録は [docs/decisions_v0.md](docs/decisions_v0.md) を参照してください。
+アプリ設計にあたっての検討過程・トレードオフの記録は [docs/archive/decisions_v7.1.md](docs/archive/decisions_v7.1.md) を参照してください。

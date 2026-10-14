@@ -3,6 +3,8 @@
      セキュリティ部分は decisions と開発中のレビュー結果をもとに整理した内容。
      正本は decisions_v4.md であり、本文書と食い違いがある場合は decisions を優先する。 -->
 
+> この文書は2026-10-14に凍結しました。以後は更新しません。内容は、decisions_v7.1 の15章の方針に沿って、spec.md・ADR・開発記録に移します。
+
 # Data and Security Design（データ・セキュリティ設計）
 
 | Item（項目） | Value（値） |
