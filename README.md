@@ -62,8 +62,8 @@
 | [01_REQUEST_DEFINITION.md](docs/01_REQUEST_DEFINITION.md) | Request Definition（要求定義） | Draft | 0.1 | SG-31 |
 | [02_REQUIREMENTS_DEFINITION.md](docs/02_REQUIREMENTS_DEFINITION.md) | Requirements Definition（要件定義） | Draft | 0.1 | SG-31 |
 | 03_DATA_AND_SECURITY_DESIGN.md | Data and Security Design（データ・セキュリティ設計） | 作成中 | - | SG-31 |
-| 04_UI_AND_FLOW_DESIGN.md | UI and Flow Design（UI・フロー設計） | 作成中 | - | SG-31 |
-| 05_ARCHITECTURE_DESIGN.md | Architecture Design（アーキテクチャ設計） | 作成中 | - | SG-31 |
+| [04_UI_AND_FLOW_DESIGN.md](docs/04_UI_AND_FLOW_DESIGN.md) | UI and Flow Design（UI・フロー設計） | Draft | 0.1 | SG-31 |
+| [05_ARCHITECTURE_DESIGN.md](docs/05_ARCHITECTURE_DESIGN.md) | Architecture Design（アーキテクチャ設計） | Draft | 0.1 | SG-31 |
 | 06_OPERATION_AND_HANDOFF.md | Operation and Handoff Design（運用・詳細設計引き継ぎ） | 作成中 | - | SG-31 |
 
 ---
@@ -109,7 +109,7 @@
 
 ### 技術構成
 
-Python 3.13、Flask、PostgreSQL（Neon）、Vercel。詳細は 05（作成中）
+Python 3.13、Flask、PostgreSQL（Neon）、Vercel。詳細は [05](docs/05_ARCHITECTURE_DESIGN.md)
 
 ### ローカルでの動かし方
 

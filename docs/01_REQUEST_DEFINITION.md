@@ -9,7 +9,7 @@
 | Created Date（作成日） | 2026-10-14 |
 | Last Updated（最終更新日） | 2026-10-14 |
 | Owner（管理者） | SG-31 |
-| Related Documents（関連文書） | [README.md](./README.md) / [02_REQUIREMENTS_DEFINITION.md](./02_REQUIREMENTS_DEFINITION.md) |
+| Related Documents（関連文書） | [README.md](../README.md) / [02_REQUIREMENTS_DEFINITION.md](./02_REQUIREMENTS_DEFINITION.md) |
 
 ---
 
