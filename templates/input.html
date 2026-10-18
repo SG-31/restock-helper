@@ -25,6 +25,10 @@
 
     <p><a href="/">トップに戻る</a></p>
 
+    {% if error %}
+    <p>{{ error }}</p>
+    {% endif %}
+
     {% with messages = get_flashed_messages(with_categories=true) %}
 
     <!-- ① 更新メッセージ・警告 -->
@@ -94,7 +98,7 @@
         {% endfor %}
     </table>
 
-    {% else %}
+    {% elif not error %}
 
     <p>補充が必要なものはありません。</p>
 

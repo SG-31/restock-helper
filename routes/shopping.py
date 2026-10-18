@@ -33,7 +33,7 @@ def shopping_list():
             "list.html",
             shopping_items=[],
             memos=[],
-            error="買い物リストを取得できませんでした。しばらくしてから、もう一度お試しください。",
+            error="データを読み込めませんでした。時間をおいて開き直してください。",
         )
 
 
@@ -86,7 +86,7 @@ def delete_memo(memo_id):
             )
 
             if cursor.rowcount == 0:
-                return "買ってほしいものが見つかりません。", 404
+                return render_template("404.html"), 404
 
             return redirect("/list")
 

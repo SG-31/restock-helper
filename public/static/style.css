@@ -98,3 +98,8 @@ button {
 input::placeholder {
     color: #ccc;
 }
+
+/* スペースのない長い買い物メモも画面幅内で折り返す */
+.memo-text {
+    overflow-wrap: anywhere;
+}

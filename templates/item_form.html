@@ -10,7 +10,7 @@
 <body>
     <p><a href="/">トップに戻る</a></p>
 
-    {% if item %}
+    {% if item or is_edit %}
     <h1>管理品目編集</h1>
     {% else %}
     <h1>管理品目登録</h1>
@@ -21,6 +21,7 @@
     {% endif %}
 
 
+    {% if not load_error %}
     <form method="POST" action="{{ action_url }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -58,6 +59,7 @@
         {% endif %}
 
     </form>
+    {% endif %}
 
 </body>
 

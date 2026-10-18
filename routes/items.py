@@ -28,7 +28,7 @@ def items():
         return render_template(
             "items.html",
             items=[],
-            error="管理品目一覧を取得できませんでした。しばらくしてから、もう一度お試しください。",
+            error="データを読み込めませんでした。時間をおいて開き直してください。",
         )
 
 
@@ -138,7 +138,7 @@ def edit_item(item_id):
 
             # 指定されたIDの品目が存在しない場合
             if item is None:
-                return "品目が見つかりません。", 404
+                return render_template("404.html"), 404
 
             # GETの場合：現在の値をフォームに表示する
             if request.method == "GET":
@@ -214,6 +214,19 @@ def edit_item(item_id):
         )
 
     except psycopg.Error as error:
+        if request.method == "GET":
+            print(f"管理品目の取得エラー: {error}")
+            # 読み込みに失敗した場合、空の編集フォームを誤って表示しない
+            return render_template(
+                "item_form.html",
+                item=None,
+                form_data=None,
+                action_url=f"/items/{item_id}/edit",
+                is_edit=True,
+                load_error=True,
+                error="データを読み込めませんでした。時間をおいて開き直してください。",
+            )
+
         print(f"管理品目の変更エラー: {error}")
 
         return render_template(
@@ -245,7 +258,7 @@ def delete_item(item_id):
 
             # 指定されたIDの品目が存在しない場合
             if item is None:
-                return "品目が見つかりません。", 404
+                return render_template("404.html"), 404
 
             # 管理品目を削除
             # ON DELETE CASCADEにより、紐づくconsumptionsも削除される

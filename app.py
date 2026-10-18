@@ -79,6 +79,10 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    # ログイン済みの場合、ログイン画面を再表示せずトップへ戻す
+    if session.get("logged_in") is True:
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         password = request.form.get("password", "").strip()
 
@@ -140,6 +144,12 @@ def require_login():
 # アクセス制御を登録した後にCSRF保護を初期化する
 # これにより、ログイン確認がCSRF確認より先に実行される
 csrf.init_app(app)
+
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    """存在しないURLなどには共通の日本語404画面を返す。"""
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(CSRFError)

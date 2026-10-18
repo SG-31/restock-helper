@@ -15,6 +15,7 @@ def get_connection():
 
     return psycopg.connect(
         os.environ["DATABASE_URL"],
+        connect_timeout=10,
         row_factory=dict_row,
     )
 

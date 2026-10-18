@@ -111,7 +111,16 @@ def stock_input():
     except psycopg.Error as error:
         print(f"在庫入力のDBエラー: {error}")
 
-        # DBエラーもFlashで通知してGETへリダイレクトする
+        # GET時の読み込み失敗ではリダイレクトを繰り返さず、共通メッセージを表示する
+        if request.method == "GET":
+            return render_template(
+                "input.html",
+                items=[],
+                shopping_list=[],
+                error="データを読み込めませんでした。時間をおいて開き直してください。",
+            )
+
+        # POST時は従来どおりFlashで通知してGETへリダイレクトする（PRG）
         flash(
             "在庫を更新できませんでした。しばらくしてから、もう一度お試しください。",
             "error",
