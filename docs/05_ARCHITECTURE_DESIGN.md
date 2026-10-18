@@ -59,20 +59,20 @@ Restock Helper を構成する部品と、そのつながり、使う技術と�
 
 ```mermaid
 flowchart LR
-  subgraph 利用者
-    E[高齢者のスマートフォン]
-    H[ヘルパーのスマートフォン]
+  subgraph U["利用者"]
+    E["高齢者のスマートフォン"]
+    H["ヘルパーのスマートフォン"]
   end
-  subgraph Vercel（シンガポール）
-    A[Flask アプリ]
+  subgraph V["Vercel（シンガポール）"]
+    A["Flask アプリ"]
   end
-  subgraph Neon（シンガポール）
-    D[(PostgreSQL)]
+  subgraph N["Neon（シンガポール）"]
+    D[("PostgreSQL")]
   end
   E -->|HTTPS| A
   H -->|HTTPS| A
-  A -->|接続先は環境変数で指定| D
-  G[GitHub] -->|main は本番<br>ほかのブランチはプレビュー| A
+  A -->|"接続先は環境変数で指定"| D
+  G["GitHub"] -->|"main は本番<br>ほかのブランチはプレビュー"| A
 ```
 
 - 画面はサーバー側で作り、ブラウザに返す。ブラウザの中で動く処理は、確認ダイアログ・変更した行の色付け・ボタンの無効化だけとする
@@ -90,7 +90,7 @@ flowchart LR
 | Other（その他） | psycopg | 3.3.6 | ・PostgreSQL への接続に使う<br>・ORM は使わず SQL を直接書く。Python と SQL と DB の関係を自分の手で理解するため |
 | Other（その他） | Flask-WTF | 1.3.0 | ・不正なフォーム送信を防ぐため（CSRF対策。03） |
 | Other（その他） | python-dotenv | 1.2.4 | ・ローカルで `.env` から環境変数を読むため。本番では使わない |
-| Other（その他） | pytest・ruff | pytest 9.1.1 | ・計算と入力チェックの単体テスト、コードの静的解析のため |
+| Other（その他） | pytest・ruff | pytest 9.1.1<br>ruff 0.17.0 | ・計算と入力チェックの単体テスト、コードの静的解析のため |
 
 - 公開先は、Render・Railway・Koyeb・PythonAnywhere・Supabase（DB）とも比べて選んだ。比較の範囲と結果は [decisions_v7.1](./archive/decisions_v7.1.md) の 6章
 - Vercel と Neon は、どちらもシンガポールにそろえる。このアプリは品目ごとに DB に問い合わせるため、アプリと DB の距離が応答の速さに大きく影響する。Neon には東京がなく、シンガポールが最も近い
@@ -126,7 +126,7 @@ flowchart LR
 | GitHub → Vercel | ・GitHub のリポジトリを Vercel に取り込む<br>・Vercel が読み取れるのは restock-helper のリポジトリだけに限る | ・push すると自動で公開する。main は本番、ほかのブランチはプレビュー |
 
 - 外部に公開する API は持たない（02 の 5.4）
-- Vercel と Neon の連携機能は使わず、接続先は Vercel の環境変数に自分で設定する
+- Vercel と Neon の連携機能は使わず、接続先は Vercel の環境変数に自分で設定する。理由：連携すると、プレビューごとに別の DB が作られる利点があるが、プレビューは本人しか開けず、本番も見本のデータだけのため、手で戻す運用で足りる。動いている設定を変える手間に見合わないため
 
 #### DB への接続の待ち時間の上限（10秒）
 
