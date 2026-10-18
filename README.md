@@ -64,7 +64,7 @@
 | 03_DATA_AND_SECURITY_DESIGN.md | Data and Security Design（データ・セキュリティ設計） | 作成中 | - | SG-31 |
 | [04_UI_AND_FLOW_DESIGN.md](docs/04_UI_AND_FLOW_DESIGN.md) | UI and Flow Design（UI・フロー設計） | Draft | 0.1 | SG-31 |
 | [05_ARCHITECTURE_DESIGN.md](docs/05_ARCHITECTURE_DESIGN.md) | Architecture Design（アーキテクチャ設計） | Draft | 0.1 | SG-31 |
-| 06_OPERATION_AND_HANDOFF.md | Operation and Handoff Design（運用・詳細設計引き継ぎ） | 作成中 | - | SG-31 |
+| [06_OPERATION_AND_HANDOFF.md](docs/06_OPERATION_AND_HANDOFF.md) | Operation and Handoff Design（運用・詳細設計引き継ぎ） | Draft | 0.1 | SG-31 |
 
 ---
 
