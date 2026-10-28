@@ -49,7 +49,11 @@
 
 ## 3. Screen Overview（画面概要）
 
-画面の画像は準備中です。
+| 買い物リスト（高齢者用） | 在庫入力（ヘルパー用） | 管理品目一覧 |
+|---|---|---|
+| <img src="docs/images/list.png" width="250" alt="買い物リスト"> | <img src="docs/images/input.png" width="250" alt="在庫入力"> | <img src="docs/images/items.png" width="250" alt="管理品目一覧"> |
+
+詳細（画面一覧・操作の流れ）：[04_UI_AND_FLOW_DESIGN.md](docs/04_UI_AND_FLOW_DESIGN.md)
 
 主な画面：トップ、買い物リスト（高齢者用）、在庫入力（ヘルパー用）、管理品目、ログイン
 
