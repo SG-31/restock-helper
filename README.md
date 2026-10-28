@@ -8,9 +8,9 @@
 | Created Date（作成日） | 2026-10-14 |
 | Last Updated（最終更新日） | 2026-10-14 |
 | Owner（管理者） | SG-31 |
-| Related Documents（関連文書） | [docs/01_REQUEST_DEFINITION.md](docs/01_REQUEST_DEFINITION.md) 〜 06（作成中） |
+| Related Documents（関連文書） | [docs/01_REQUEST_DEFINITION.md](docs/01_REQUEST_DEFINITION.md) 〜 06 |
 
-> **現在の状態**：アプリは公開済みです。設計書は作成中です。
+> **現在の状態**：デモ版を公開しています（見本のデータのみ）。
 
 ---
 
@@ -24,6 +24,7 @@
 6. [Glossary（用語集・略語定義）](#6-glossary用語集略語定義)
 7. [Document Owners and Reviewers（文書管理者・レビュアー一覧）](#7-document-owners-and-reviewers文書管理者レビュアー一覧)
 8. [Demo and Getting Started（デモ・動かし方）](#8-demo-and-getting-starteddemo動かし方)
+9. [How AI Was Used（AIの利用）](#9-how-ai-was-usedaiの利用)
 
 ---
 
@@ -65,7 +66,7 @@
 |---|---|---|---|---|
 | [01_REQUEST_DEFINITION.md](docs/01_REQUEST_DEFINITION.md) | Request Definition（要求定義） | Draft | 0.1 | SG-31 |
 | [02_REQUIREMENTS_DEFINITION.md](docs/02_REQUIREMENTS_DEFINITION.md) | Requirements Definition（要件定義） | Draft | 0.1 | SG-31 |
-| 03_DATA_AND_SECURITY_DESIGN.md | Data and Security Design（データ・セキュリティ設計） | 作成中 | - | SG-31 |
+| [03_DATA_AND_SECURITY_DESIGN.md](docs/03_DATA_AND_SECURITY_DESIGN.md) | Data and Security Design（データ・セキュリティ設計） | Draft | 0.1 | SG-31 |
 | [04_UI_AND_FLOW_DESIGN.md](docs/04_UI_AND_FLOW_DESIGN.md) | UI and Flow Design（UI・フロー設計） | Draft | 0.1 | SG-31 |
 | [05_ARCHITECTURE_DESIGN.md](docs/05_ARCHITECTURE_DESIGN.md) | Architecture Design（アーキテクチャ設計） | Draft | 0.1 | SG-31 |
 | [06_OPERATION_AND_HANDOFF.md](docs/06_OPERATION_AND_HANDOFF.md) | Operation and Handoff Design（運用・詳細設計引き継ぎ） | Draft | 0.1 | SG-31 |
@@ -128,3 +129,18 @@ python app.py
 ```
 
 テスト：`python -m pytest`
+
+---
+
+## 9. How AI Was Used（AIの利用）
+
+実装とレビューを別々の AI に担当させ、最終的な判断と確認は自分で行いました。
+
+| Item（項目） | Details（内容） |
+|---|---|
+| 役割分担 | ・本人：仕様・設計の最終決定、コードの確認、動作確認、Git の操作<br>・ChatGPT：実装<br>・Claude：設計の相談、依頼文の作成、レビュー、記録の管理<br>・Claude（学習アシスタント役）：エラーログの解析、コードの読み解きとデバッグの補助。アプリのコードは書いていない |
+| 実装とレビューを分けた理由 | 実装とレビューを別の AI に担当させることで、1つの AI では気づきにくい見落としに気づきやすくするため |
+| 本人が判断したこと | ・公開先（Vercel＋Neon）<br>・ログインの方式（共通パスワード）<br>・補充する数の計算ルール（直近4回の消費量の平均 × 1.5、端数は切り上げ） |
+| 確かめ方 | ・AI の報告ではなく、差分と実行結果を見て判断した<br>・テスト（pytest）と静的解析（ruff）を、取り込む前に毎回実行した<br>・DB を止めて、エラーのときの表示を画面で確かめた |
+
+運用のルール（生成 AI への依頼の仕方など）は [06_OPERATION_AND_HANDOFF.md](docs/06_OPERATION_AND_HANDOFF.md) にまとめています。
