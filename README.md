@@ -12,6 +12,8 @@
 
 > **現在の状態**：デモ版を公開しています（見本のデータのみ）。
 
+> 変更履歴は [CHANGELOG.md](CHANGELOG.md) を参照。
+
 ---
 
 ## Table of Contents（目次）
